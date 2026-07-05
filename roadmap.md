@@ -19,9 +19,14 @@ Completed
 
 Interactive Map
 
+Completed
+
 - Tile selection
 - Hover effects
-- Information panel
+- Selection information panel
+- Sprite and marker interaction fixes
+- Multi-tile structure footprint selection
+- Unified large structure visual cells
 
 ---
 
@@ -29,16 +34,23 @@ Interactive Map
 
 Camera
 
+Next
+
 - Zoom
 - Pan
 - Fit to screen
 - Reset view
+- Focus on tiles and structures
+- Device-neutral, input-independent controls
+- Camera design note in docs/CAMERA.md
 
 ---
 
 ## Phase 3
 
 Territory
+
+Planned
 
 - Ownership colours
 - Union overlays
@@ -51,6 +63,8 @@ Territory
 
 Editing
 
+Planned
+
 - Tile editor
 - Notes
 - Objectives
@@ -62,6 +76,8 @@ Editing
 
 History
 
+Planned
+
 - Timeline
 - Playback
 - Capture history
@@ -71,6 +87,8 @@ History
 ## Phase 6
 
 Intelligence
+
+Planned
 
 - Search
 - Filters
@@ -82,6 +100,8 @@ Intelligence
 ## Phase 7
 
 Future
+
+Planned
 
 - Multiple kingdoms
 - Multiple seasons

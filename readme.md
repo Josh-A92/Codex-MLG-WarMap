@@ -22,7 +22,7 @@ If a choice must be made between making the map look better or making it more ac
 
 Current Version
 
-**v0.1 - Foundation**
+**v0.2.11 - Phase 1 Interactive Map Complete**
 
 Completed
 
@@ -31,13 +31,18 @@ Completed
 - ✅ Structure locations verified
 - ✅ Ice Mist terrain selected
 - ✅ Initial sprite artwork completed
-- ✅ Prototype HTML renderer
+- ✅ Interactive map renderer with tile selection
+- ✅ Selection information panel
+- ✅ Hover states for tiles and structures
+- ✅ Sprite and marker interaction fixes
+- ✅ Multi-tile structure footprint selection
+- ✅ Unified large structure visual cells for Town, Metropolis and Royal City
 
 Current Focus
 
-- Sprite integration
-- Project restructuring
-- Code modularisation
+- Phase 2 Camera implementation
+- Device-neutral camera controls and interaction design
+- Camera design note in docs/CAMERA.md
 
 ---
 
@@ -61,7 +66,7 @@ The finished application should provide:
 
 ## 1. Data Driven
 
-The renderer should be generated from structured map data.
+The renderer is generated from structured map data.
 
 The renderer should never rely on manually positioning structures.
 
@@ -69,7 +74,7 @@ The renderer should never rely on manually positioning structures.
 
 ## 2. Accuracy First
 
-The Excel blueprint is the source of truth.
+The Excel blueprint remains the source of truth.
 
 If the renderer differs from the blueprint, the renderer is wrong.
 
@@ -77,7 +82,7 @@ If the renderer differs from the blueprint, the renderer is wrong.
 
 ## 3. Modular Design
 
-Project components should remain independent.
+Project components remain independent.
 
 - HTML controls layout.
 - CSS controls appearance.
@@ -85,15 +90,15 @@ Project components should remain independent.
 - JSON stores map data.
 - Sprites provide artwork.
 
-Each layer should remain separate.
+Each layer remains separate.
 
 ---
 
 ## 4. Incremental Development
 
-Large rewrites should be avoided.
+Large rewrites are avoided.
 
-Every change should be:
+Every change is:
 
 - small
 - testable
@@ -103,9 +108,19 @@ Every change should be:
 
 ## 5. Consistent Visual Style
 
-All buildings should use the approved Sprite Pack.
+All buildings use the approved Sprite Pack.
 
 Visual consistency is preferred over adding unnecessary detail.
+
+---
+
+## 6. Camera Design Principle
+
+The camera system is being designed to be input-independent and device-neutral.
+
+Zoom, pan, fit, reset and focus actions should be available through mouse, keyboard, trackpad, touch and UI buttons.
+
+The internal map grid remains 20 × 20, while large structures can be presented to the user as single merged visual cells.
 
 ---
 
@@ -147,73 +162,45 @@ MLG WarMap/
 
 # Development Roadmap
 
-## Phase 1
+## Phase 1 - Interactive Map
 
-Foundation
+Completed
 
-- Project structure
-- Renderer
-- Data
+- Tile selection
+- Selection information panel
+- Hover states
+- Sprite and marker interaction fixes
+- Multi-tile structure footprint selection
+- Unified large structure visual cells
 
-## Phase 2
+## Phase 2 - Camera
 
-Map Rendering
-
-- Grid
-- Terrain
-- Sprites
-- Frost Mines
-
-## Phase 3
-
-Camera
+Next
 
 - Zoom
 - Pan
-- Fit to Screen
+- Fit and reset
+- Focus on tiles and structures
+- Device-neutral camera controls
+- Design note in docs/CAMERA.md
 
-## Phase 4
+## Phase 3 - Ownership and Territory
 
-Ownership
+Planned
 
 - Territory colours
 - Borders
-- Selection
-- Highlights
-
-## Phase 5
-
-Interface
-
 - Legend
-- Filters
-- Activity
-- Selected objective
-- Intelligence
+- Ownership overlays
 
-## Phase 6
+## Phase 4 - History and Intelligence
 
-History
+Planned
 
 - Timeline
 - Playback
-- Capture history
-
-## Phase 7
-
-Reports
-
-- Statistics
-- Union summaries
-- Strategic analysis
-
-## Phase 8
-
-Automation
-
-- Faster data updates
-- External integrations
-- Future API support
+- Search and filters
+- Reports
 
 ---
 

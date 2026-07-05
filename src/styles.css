@@ -155,6 +155,66 @@ h1 { margin:0; font-size:22px; letter-spacing:.4px; }
   color:rgba(0,0,0,.62);
   z-index:1;
 }
+.tile:hover:not(.selected):not(.selected-footprint):not(.footprint-internal),
+.tile.hovered:not(.selected):not(.selected-footprint):not(.footprint-internal) {
+  outline:2px solid rgba(255,255,255,.45);
+  outline-offset:-1px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
+}
+.tile.selected:not(.selected-footprint):not(.footprint-internal) {
+  outline:3px solid #ffe66d;
+  outline-offset:-2px;
+  box-shadow: inset 0 0 0 2px rgba(255,230,109,.9), 0 0 0 2px rgba(255,230,109,.35);
+  z-index:5;
+}
+.tile.footprint-internal {
+  background:transparent;
+  border-color:transparent;
+  box-shadow:none;
+  overflow:visible;
+}
+.tile.footprint-internal::after {
+  display:none;
+}
+.tile.footprint-internal .code {
+  display:none;
+}
+.tile.footprint-internal:hover,
+.tile.footprint-internal.hovered,
+.tile.footprint-internal.selected {
+  outline:none;
+  box-shadow:none;
+}
+.tile.merged-footprint.merged-edge-top {
+  border-top:2px solid rgba(226,218,190,.58);
+}
+.tile.merged-footprint.merged-edge-right {
+  border-right:2px solid rgba(226,218,190,.58);
+}
+.tile.merged-footprint.merged-edge-bottom {
+  border-bottom:2px solid rgba(226,218,190,.58);
+}
+.tile.merged-footprint.merged-edge-left {
+  border-left:2px solid rgba(226,218,190,.58);
+}
+.tile.selected-footprint {
+  border-color:transparent;
+  outline:none;
+  box-shadow:none;
+  z-index:5;
+}
+.tile.selected-footprint.selected-edge-top {
+  border-top:3px solid #ffe66d;
+}
+.tile.selected-footprint.selected-edge-right {
+  border-right:3px solid #ffe66d;
+}
+.tile.selected-footprint.selected-edge-bottom {
+  border-bottom:3px solid #ffe66d;
+}
+.tile.selected-footprint.selected-edge-left {
+  border-left:3px solid #ffe66d;
+}
 .FM1 { background:#AFC4D1; }
 .FM2 { background:#AFC4D1; }
 .FM3 { background:#AFC4D1; }
@@ -173,6 +233,33 @@ h1 { margin:0; font-size:22px; letter-spacing:.4px; }
 .MP6 { background:#AFC4D1; }
 .RC7 { background:#AFC4D1; }
 
+.marker-inner,
+.marker-content,
+.sprite-img {
+  pointer-events:none;
+}
+.footprint-overlay {
+  position:absolute;
+  z-index:8;
+  left:calc((var(--c) - 1) * (var(--tile) + var(--gap)));
+  top:calc((var(--r) - 1) * (var(--tile) + var(--gap)));
+  width:calc(var(--cols) * var(--tile) + (var(--cols) - 1) * var(--gap));
+  height:calc(var(--rows) * var(--tile) + (var(--rows) - 1) * var(--gap));
+  border-radius:7px;
+  background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.04)), rgba(132,150,160,.38);
+  border:2px solid rgba(255,255,255,.24);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);
+  pointer-events:auto;
+}
+.footprint-overlay.hovered {
+  border-color:rgba(255,255,255,.64);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.24), 0 0 0 1px rgba(255,255,255,.18);
+  transform:translateZ(0);
+}
+.footprint-overlay.selected {
+  border-color:#ffe66d;
+  box-shadow:inset 0 0 0 2px rgba(255,230,109,.9), 0 0 0 2px rgba(255,230,109,.35);
+}
 .marker {
   position:absolute;
   z-index:10;
@@ -257,6 +344,57 @@ h1 { margin:0; font-size:22px; letter-spacing:.4px; }
   display:block;
   font-size:21px;
   margin-bottom:2px;
+}
+.selection-panel {
+  margin-top:14px;
+  padding:14px;
+  border:1px solid #35536a;
+  border-radius:12px;
+  background:rgba(4,12,20,.9);
+  color:#dfeaf6;
+}
+.selection-panel h2 {
+  margin:0 0 10px 0;
+  font-size:15px;
+  letter-spacing:.5px;
+}
+.selection-empty {
+  color:#a8bacb;
+  font-size:13px;
+}
+.selection-summary {
+  display:grid;
+  gap:10px;
+}
+.selection-title {
+  font-size:16px;
+  font-weight:800;
+  color:#fff;
+}
+.selection-meta,
+.selection-secondary {
+  display:grid;
+  gap:6px;
+}
+.selection-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  font-size:13px;
+}
+.selection-row:last-child {
+  border-bottom:0;
+}
+.selection-label {
+  color:#8ea6bb;
+  font-weight:700;
+}
+.selection-row--subtle {
+  color:#a8bacb;
+  font-size:12px;
 }
 .note {
   margin-top:10px;

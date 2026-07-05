@@ -28,6 +28,23 @@ season1-map.json              Sprite Library
 
 ---
 
+# Current Implementation Status
+
+## Completed Phase 1 Interactive Map
+
+The current implementation supports:
+
+- Tile selection
+- Selection information panel
+- Hover states for empty tiles and structures
+- Sprite and marker interaction handling
+- Multi-tile structure footprint selection
+- Unified visual cells for large structures such as Town, Metropolis and Royal City
+
+The application remains data-driven and continues to use the existing 20 × 20 internal grid.
+
+---
+
 # Layer Responsibilities
 
 ## HTML
@@ -67,6 +84,7 @@ Responsible for:
 - Creating the grid
 - Rendering sprites
 - User interaction
+- Selection state and detail panel updates
 - Future camera system
 - Future selection system
 
@@ -96,6 +114,20 @@ Contains:
 - UI artwork
 
 Should never contain game logic.
+
+---
+
+# Phase 2 Camera Direction
+
+Phase 2 will introduce a camera layer that is designed to be input-independent and device-neutral.
+
+The intended design is documented in docs/CAMERA.md and includes:
+
+- Zoom, pan, fit, reset and focus actions available through mouse, keyboard, trackpad, touch and UI buttons
+- Cursor or finger-centred zoom behavior where practical
+- Camera transforms applied to a map container rather than repositioning individual tiles or sprites
+- Selection remaining independent from camera state
+- The internal 20 × 20 grid staying intact while large structures can be presented as single user-facing cells
 
 ---
 
