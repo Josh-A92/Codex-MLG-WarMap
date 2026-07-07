@@ -106,6 +106,48 @@ h1 { margin:0; font-size:22px; letter-spacing:.4px; }
   -webkit-user-select:none;
   -webkit-user-drag:none;
 }
+.camera-toolbar {
+  position:absolute;
+  top:12px;
+  left:12px;
+  z-index:40;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:8px;
+  border-radius:14px;
+  border:1px solid rgba(196,217,232,.24);
+  background:linear-gradient(180deg,rgba(8,18,28,.6),rgba(8,18,28,.42));
+  backdrop-filter: blur(4px);
+}
+.camera-button {
+  width:46px;
+  height:46px;
+  border-radius:12px;
+  border:1px solid rgba(209,226,240,.35);
+  background:rgba(12,24,36,.52);
+  color:#f0f6ff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  opacity:.72;
+  transition:opacity .14s ease, background-color .14s ease, border-color .14s ease, transform .14s ease;
+}
+.camera-button:hover,
+.camera-button:focus-visible {
+  opacity:1;
+  background:rgba(20,38,56,.92);
+  border-color:rgba(225,238,248,.82);
+  transform:translateY(-1px);
+  outline:none;
+}
+.camera-icon {
+  font-size:20px;
+  line-height:1;
+  font-weight:900;
+  pointer-events:none;
+}
 .grid-wrap {
   display:grid;
   grid-template-columns: 30px max-content 30px;
@@ -160,6 +202,15 @@ h1 { margin:0; font-size:22px; letter-spacing:.4px; }
   overflow:hidden;
   background:#6f797d;
 }
+.tile.ownership-owned::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:color-mix(in srgb, var(--ownership-color) 76%, transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--ownership-color) 48%, rgba(255,255,255,.14));
+  pointer-events:none;
+  z-index:2;
+}
 .tile::after {
   content:"";
   position:absolute;
@@ -168,6 +219,12 @@ h1 { margin:0; font-size:22px; letter-spacing:.4px; }
     repeating-linear-gradient(135deg,rgba(255,255,255,.045) 0 5px,rgba(0,0,0,.025) 5px 12px),
     radial-gradient(circle at 25% 20%,rgba(255,255,255,.06),transparent 45%);
   pointer-events:none;
+  z-index:1;
+}
+.tile.ownership-owned::after {
+  background:
+    repeating-linear-gradient(135deg,rgba(255,255,255,.015) 0 5px,rgba(0,0,0,.01) 5px 12px),
+    radial-gradient(circle at 25% 20%,rgba(255,255,255,.035),transparent 45%);
 }
 .tile .code {
   position:absolute;
@@ -176,7 +233,7 @@ h1 { margin:0; font-size:22px; letter-spacing:.4px; }
   font-size:9px;
   font-weight:800;
   color:rgba(0,0,0,.62);
-  z-index:1;
+  z-index:3;
 }
 .tile:hover:not(.selected):not(.selected-footprint):not(.footprint-internal),
 .tile.hovered:not(.selected):not(.selected-footprint):not(.footprint-internal) {
@@ -197,6 +254,9 @@ h1 { margin:0; font-size:22px; letter-spacing:.4px; }
   overflow:visible;
 }
 .tile.footprint-internal::after {
+  display:none;
+}
+.tile.footprint-internal.ownership-owned::before {
   display:none;
 }
 .tile.footprint-internal .code {
@@ -273,6 +333,15 @@ h1 { margin:0; font-size:22px; letter-spacing:.4px; }
   border:2px solid rgba(255,255,255,.24);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);
   pointer-events:auto;
+}
+.footprint-overlay.ownership-owned {
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.03)),
+    color-mix(in srgb, var(--ownership-color) 74%, transparent);
+  border-color:color-mix(in srgb, var(--ownership-color) 88%, rgba(255,255,255,.34));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--ownership-color) 52%, rgba(255,255,255,.13)),
+    inset 0 0 14px color-mix(in srgb, var(--ownership-color) 22%, transparent);
 }
 .footprint-overlay.hovered {
   border-color:rgba(255,255,255,.64);
@@ -418,6 +487,38 @@ h1 { margin:0; font-size:22px; letter-spacing:.4px; }
 .selection-row--subtle {
   color:#a8bacb;
   font-size:12px;
+}
+.territory-editor {
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid rgba(255,255,255,.1);
+  display:grid;
+  gap:8px;
+}
+.territory-editor-title {
+  margin:0;
+  font-size:13px;
+  letter-spacing:.4px;
+  color:#d5e4f2;
+}
+.territory-editor-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.territory-owner-select {
+  min-width:140px;
+  border:1px solid rgba(196,217,232,.35);
+  border-radius:8px;
+  background:#0d1f30;
+  color:#f0f6ff;
+  padding:6px 10px;
+  font-size:13px;
+}
+.territory-owner-select:focus-visible {
+  outline:2px solid rgba(255,230,109,.62);
+  outline-offset:1px;
 }
 .note {
   margin-top:10px;

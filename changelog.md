@@ -60,3 +60,33 @@
 - Added touch camera pan with single-finger drag threshold, immediate stop on touch end, tap-to-select preservation, and coexistence with existing pinch zoom behavior
 ## v0.2.19
 - Added adaptive camera pan constraints with approximately one-tile overscroll at each map edge, scaling with zoom and viewport size so the map cannot be dragged off-screen
+## v0.2.20
+- Added a floating camera toolbar foundation with placeholder icons and wired actions for zoom in/out, fit map, reset view, and centre on selection
+## v0.2.21
+- Added the Phase 3 territory design note in docs/TERRITORY.md defining ownership source-of-truth, structure ownership display rules, union color storage, overlay rendering guidance, and future compatibility for history/editing/reports/multi-kingdom support
+## v0.2.22
+- Updated docs/TERRITORY.md with a union registry model where tiles store ownership by union id and overlays, legends, and reports resolve display data from a centralized registry
+## v0.2.23
+- Added data/unions.json with Moonlight Guillotine as the first union registry entry and wired startup loading into application state for future ownership use
+## v0.2.24
+- Added ownerId to all logical tiles in data/season1-map.json (default null) and updated selection owner labels to resolve from the loaded union registry while preserving existing visuals and interactions
+## v0.2.25
+- Added src/services/ownership-service.js as a central ownership API for tile and structure owner resolution, and updated renderer owner labeling to consume the service
+## v0.2.26
+- Seeded a small Royal City-area tile ownership cluster with ownerId union-0001 in data/season1-map.json for Phase 3 ownership testing while keeping most tiles unassigned
+## v0.2.27
+- Added subtle ownership overlay rendering from tile ownerId and union colors, including unified large-structure footprint ownership tinting for Royal City while preserving existing camera, selection, and interaction behavior
+## v0.2.28
+- Added Phase 3.6 in-memory single-tile territory editing in the selection panel with a union-backed Owner dropdown that immediately updates tile ownerId, ownership overlays, and displayed owner label while keeping structure selections read-only
+## v0.2.29
+- Tuned ownership visuals for broader pastel territory readability by updating MLG to a clearer sky-blue and expanding data/unions.json with additional distinct inactive union entries for future testing while preserving stable union ids
+- Increased tile and large-footprint ownership overlay strength to improve visibility while keeping sprite/label readability and maintaining stronger hover/selection emphasis
+## v0.2.30
+- Increased Phase 3.7 ownership overlay visibility to a stronger pastel intensity range so owned territory is identifiable at a glance on Ice Mist while preserving label/sprite readability
+- Added subtle owned tile and footprint edge/glow tinting to improve territory legibility without overriding stronger hover and selection states
+## v0.2.31
+- Tuned owned tiles from subtle tint toward clear pastel territory fill by raising ownership colour strength and reducing Ice Mist diagonal texture visibility inside owned cells
+- Increased large owned footprint fill intensity so owned multi-tile structures read as coherent pastel territory blocks while keeping selection and hover states visually dominant
+## v0.2.32
+- Extended territory editing to structure selections by showing the Owner dropdown for markers and applying ownership changes across every tile in the selected structure footprint
+- Kept structure ownership fully derived from footprint tile ownerIds through the ownership service (including mixed/partial dropdown state handling) without storing ownerId on structure objects

@@ -21,6 +21,9 @@ The objective is to allow any future developer or AI assistant to understand the
         ┌─────────────┴─────────────┐
         ▼                           ▼
 season1-map.json              Sprite Library
+      │
+      ▼
+    unions.json
         │                           │
         └─────────────┬─────────────┘
                       ▼
@@ -81,6 +84,8 @@ Never stores game data.
 Responsible for:
 
 - Reading map data
+- Reading union registry data
+- Centralizing ownership logic in src/services/ownership-service.js
 - Creating the grid
 - Rendering sprites
 - User interaction
@@ -98,6 +103,7 @@ Stores:
 
 - Tile information
 - Structure locations
+- Union registry data
 - Future ownership
 - Future history
 
@@ -139,7 +145,7 @@ Selection
 
 Camera
 
-Ownership
+Ownership (service layer foundation in src/services/ownership-service.js)
 
 History
 

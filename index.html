@@ -42,6 +42,23 @@
       <span>Row 1 = top · Col 1 = left</span>
     </div>
     <div class="camera-viewport" id="cameraViewport">
+      <div class="camera-toolbar" id="cameraToolbar" role="toolbar" aria-label="Camera Controls">
+        <button class="camera-button" data-camera-action="zoom-in" aria-label="Zoom In" title="Zoom In">
+          <span class="camera-icon camera-icon--zoom-in">+</span>
+        </button>
+        <button class="camera-button" data-camera-action="zoom-out" aria-label="Zoom Out" title="Zoom Out">
+          <span class="camera-icon camera-icon--zoom-out">−</span>
+        </button>
+        <button class="camera-button" data-camera-action="fit-map" aria-label="Fit Map" title="Fit Map">
+          <span class="camera-icon camera-icon--fit-map">⛶</span>
+        </button>
+        <button class="camera-button" data-camera-action="reset-view" aria-label="Reset View" title="Reset View">
+          <span class="camera-icon camera-icon--reset-view">⌂</span>
+        </button>
+        <button class="camera-button" data-camera-action="center-selection" aria-label="Centre on Selection" title="Centre on Selection">
+          <span class="camera-icon camera-icon--center-selection">◎</span>
+        </button>
+      </div>
       <div class="grid-wrap" id="cameraSurface">
         <div class="colheads" id="colheads"></div>
         <div class="rowheads" id="rowheads"></div>
@@ -58,6 +75,7 @@
   </section>
 </div>
 
+<script src="src/services/ownership-service.js"></script>
 <script src="src/map-renderer.js"></script>
 </body>
 </html>
