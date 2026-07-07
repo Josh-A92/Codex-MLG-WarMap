@@ -11,6 +11,12 @@
     const getTileByPosition = typeof config.getTileByPosition === "function"
       ? config.getTileByPosition
       : () => null;
+    const getTileOwnerOverride = typeof config.getTileOwner === "function"
+      ? config.getTileOwner
+      : null;
+    const setTileOwnerOverride = typeof config.setTileOwner === "function"
+      ? config.setTileOwner
+      : null;
 
     function getUnionById(unionId) {
       if (!unionId) {
@@ -28,6 +34,10 @@
     function getTileOwner(tile) {
       if (!tile || typeof tile !== "object") {
         return null;
+      }
+
+      if (getTileOwnerOverride) {
+        return normalizeOwnerId(getTileOwnerOverride(tile));
       }
 
       return normalizeOwnerId(tile.ownerId);
@@ -58,6 +68,10 @@
     function setTileOwner(tile, ownerId) {
       if (!tile || typeof tile !== "object") {
         return null;
+      }
+
+      if (setTileOwnerOverride) {
+        return normalizeOwnerId(setTileOwnerOverride(tile, normalizeOwnerId(ownerId)));
       }
 
       tile.ownerId = normalizeOwnerId(ownerId);

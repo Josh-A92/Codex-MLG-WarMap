@@ -22,7 +22,7 @@ If a choice must be made between making the map look better or making it more ac
 
 Current Version
 
-**v0.2.11 - Phase 1 Interactive Map Complete**
+**v0.4.0 - Phase 3 Territory Ownership Baseline Verified**
 
 Completed
 
@@ -40,9 +40,9 @@ Completed
 
 Current Focus
 
-- Phase 2 Camera implementation
-- Device-neutral camera controls and interaction design
-- Camera design note in docs/CAMERA.md
+- Phase 2.5 Command Centre and server workspace documentation alignment
+- Season 1 multi-server workspace direction with shared verified base map
+- Per-server strategic state separation planning (ownership, notes, objectives, history, scoring, last-updated)
 
 ---
 
@@ -53,8 +53,11 @@ The finished application should provide:
 - Accurate strategic map
 - Interactive UI
 - Ownership visualisation
+- Command Centre season overview
+- Multi-server workspace switching
 - Historical playback
 - Intelligence notes
+- Strategic summaries (Ice Crystals, tiles owned, territory percentage, captured vs available structures)
 - Strategic reports
 - Search
 - Zoom and camera controls
@@ -104,6 +107,8 @@ Every change is:
 - testable
 - reversible
 
+One logical milestone should be implemented per iteration.
+
 ---
 
 ## 5. Consistent Visual Style
@@ -121,6 +126,28 @@ The camera system is being designed to be input-independent and device-neutral.
 Zoom, pan, fit, reset and focus actions should be available through mouse, keyboard, trackpad, touch and UI buttons.
 
 The internal map grid remains 20 × 20, while large structures can be presented to the user as single merged visual cells.
+
+---
+
+## 7. Workspace Direction
+
+Season 1 now targets a two-level workspace model:
+
+- Command Centre (front page/home workspace)
+- Eight Season 1 server map workspaces
+
+The eight server workspaces share the same verified Season 1 base map.
+
+Server-specific strategic state is separated per server and must be stored independently for:
+
+- ownership
+- notes
+- objectives
+- history
+- scoring
+- last-updated
+
+The server dock should sit bottom-left, just outside the map viewport, so workspace switching stays close to the map without covering it.
 
 ---
 
@@ -184,9 +211,20 @@ Next
 - Device-neutral camera controls
 - Design note in docs/CAMERA.md
 
-## Phase 3 - Ownership and Territory
+## Phase 2.5 - Command Centre and Server Workspaces
 
 Planned
+
+- Command Centre as the Season 1 home/front page
+- Eight Season 1 server/map workspaces
+- Bottom-left server dock outside the map viewport
+- Shared verified Season 1 base map across all servers
+- Per-server storage for ownership, notes, objectives, history, scoring, and last-updated
+- Strategic summary blocks for Ice Crystals, tiles owned, territory percentage, and captured vs available structures
+
+## Phase 3 - Ownership and Territory
+
+In Progress
 
 - Territory colours
 - Borders
@@ -215,6 +253,7 @@ The following rules should always be respected.
 5. Prioritise readability over cleverness.
 6. Build features incrementally.
 7. Test each change before moving on.
+8. Keep one logical milestone per iteration.
 
 ---
 

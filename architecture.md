@@ -16,6 +16,10 @@ The objective is to allow any future developer or AI assistant to understand the
                 Browser (HTML)
                       │
                       ▼
+            Workspace Navigation Layer
+            (Command Centre / Server Map)
+                      │
+                      ▼
             map-renderer.js
                       │
         ┌─────────────┴─────────────┐
@@ -24,10 +28,15 @@ season1-map.json              Sprite Library
       │
       ▼
     unions.json
+      │
+      ▼
+season1-server-state.json
         │                           │
         └─────────────┬─────────────┘
                       ▼
                  Rendered Map
+
+Command Centre summaries are computed from server state + shared map context.
 
 ---
 
@@ -85,7 +94,11 @@ Responsible for:
 
 - Reading map data
 - Reading union registry data
+- Reading Season 1 server state data (data/season1-servers.json)
+- Managing workspace state (Command Centre vs active server map)
+- Managing per-server state selection
 - Centralizing ownership logic in src/services/ownership-service.js
+- Centralizing strategic summaries in src/services/summary-service.js
 - Creating the grid
 - Rendering sprites
 - User interaction
@@ -104,8 +117,12 @@ Stores:
 - Tile information
 - Structure locations
 - Union registry data
-- Future ownership
-- Future history
+- Shared Season 1 base map data
+- Per-server ownership, notes, objectives, history, scoring, and last-updated data
+
+Current workspace state foundation file:
+
+- data/season1-servers.json
 
 This is the application's data layer.
 
@@ -147,6 +164,12 @@ Camera
 
 Ownership (service layer foundation in src/services/ownership-service.js)
 
+Workspace Controller
+
+Server State Service
+
+Strategic Summary Service
+
 History
 
 Analytics
@@ -162,6 +185,8 @@ Each module should have a clearly defined responsibility.
 The renderer should be capable of rendering ANY correctly formatted map.
 
 It should not know anything about Season 1 specifically.
+
+Workspace navigation, strategic summaries, and per-server storage should remain outside the renderer.
 ---
 
 # Input Independence
@@ -214,6 +239,47 @@ This means:
 - The information panel represents the structure as a single object.
 
 The logical grid must remain unchanged for future systems such as ownership, history, analytics and map editing.
+
+---
+
+# Season 1 Workspace Architecture Direction
+
+Season 1 should use:
+
+- One Command Centre home/front-page workspace
+- Eight server/map workspaces
+
+All eight server workspaces share the verified Season 1 base map.
+
+Server-specific strategic state must be stored separately per server for:
+
+- ownership
+- notes
+- objectives
+- history
+- scoring
+- last-updated
+
+This separation preserves blueprint accuracy while allowing each server to evolve independently.
+
+## Server Dock Placement
+
+Workspace/server navigation should sit bottom-left, just outside the map viewport.
+
+This keeps server switching near map interactions without obscuring tiles, structures, or camera interactions.
+
+## Strategic Summary Data
+
+Command Centre and server workspace summaries should support:
+
+- Ice Crystals
+- tiles owned
+- territory percentage
+- captured vs available structures
+
+Current implementation calculates tiles owned, territory percentage, and captured vs available structures from shared map data plus per-server ownership state.
+
+Ice Crystal scoring remains intentionally unconfigured unless verified scoring rules are available.
 
 ---
 

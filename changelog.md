@@ -27,6 +27,11 @@
 - Added a subtle hover highlight for map tiles without changing the selected tile behaviour
 ## v0.2.4
 - Completed Phase 1 Interactive Map milestones for selection, selection details, and hover feedback
+## v0.4.4
+- Wired src/services/summary-service.js into runtime and connected it to shared map data, base tile ownership, union registry, and Season 1 server state
+- Replaced Command Centre placeholder dashboard values with calculated tiles owned, territory percentage, and captured vs available structure summaries per server
+- Kept Ice Crystal scoring unconfigured when scoring rules are absent by displaying a clear "Scoring rules not configured" label instead of invented values
+- Refreshed Command Centre server card summaries whenever workspace/server selection changes so dashboard values stay synchronized with active server context
 - Verified the map remains data-driven and continues to render 400 tiles with 80 marker structures
 ## v0.2.5
 - Fixed marker interaction so sprites no longer block tile hover or selection across the full tile area
@@ -90,3 +95,23 @@
 ## v0.2.32
 - Extended territory editing to structure selections by showing the Owner dropdown for markers and applying ownership changes across every tile in the selected structure footprint
 - Kept structure ownership fully derived from footprint tile ownerIds through the ownership service (including mixed/partial dropdown state handling) without storing ownerId on structure objects
+## v0.4.0
+- Documentation-only update for Command Centre and multi-server Season 1 direction: Command Centre as home workspace, eight server/map workspaces, shared verified base map, and separated per-server strategic state
+- Added documentation requirements for bottom-left server dock placement outside the map viewport and strategic summaries (Ice Crystals, tiles owned, territory percentage, captured vs available structures)
+- Reaffirmed project principles in documentation: accuracy before appearance, data-driven architecture, and one logical milestone per iteration
+## v0.4.1
+- Added first UI shell for workspace navigation with Command Centre as the default home workspace and eight Season 1 server workspace actions (366-373)
+- Added bottom-left server dock positioned outside the map viewport, with active workspace/server highlighting and Command Centre return action
+- Kept existing map renderer, camera, selection, and data model intact while switching between Command Centre and the shared Season 1 map workspace
+## v0.4.2
+- Added the first static Command Centre dashboard layout with one card per Season 1 server and explicit placeholder labels for active union, Ice Crystals, tiles owned, territory percentage, and captured vs available structures
+- Added Open Map actions on every dashboard card and preserved card-click routing so either action opens the correct server map workspace
+- Kept scoring calculations unimplemented and clearly marked all dashboard values as placeholders for future data-driven summaries
+## v0.4.3
+- Added data/season1-servers.json as the first Season 1 server state foundation with eight server entries and required per-server fields (id, label, baseMapId, activeUnionId, ownership, notes, objectives, history, lastUpdated)
+- Updated workspace shell to generate server dock buttons and Command Centre dashboard cards from Season 1 server data instead of hard-coded HTML
+- Preserved shared season1-map.json map rendering with no base-map duplication, no persistence layer, and no real history/scoring playback logic
+## v0.4.5
+- Polished Command Centre spacing and typographic hierarchy for improved dashboard readability while preserving existing data and interaction behavior
+- Refined server dock sizing, active-state contrast, and responsive placement so workspace/server state is clearer and the dock stays outside map content on desktop
+- Added responsive small-window dock layout adjustments to keep map viewport usability and reduce visual clutter without adding new features

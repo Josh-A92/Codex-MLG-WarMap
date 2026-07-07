@@ -34,7 +34,7 @@ Completed
 
 Camera
 
-Next
+Completed
 
 - Zoom
 - Pan
@@ -46,11 +46,26 @@ Next
 
 ---
 
+## Phase 2.5
+
+Command Centre and Server Workspaces
+
+Next
+
+- Command Centre as the Season 1 home/front-page workspace
+- Eight Season 1 server/map workspaces
+- Bottom-left server dock just outside the map viewport
+- Shared verified Season 1 base map across all servers
+- Per-server strategic state separation for ownership, notes, objectives, history, scoring, and last-updated
+- Strategic summaries for Ice Crystals, tiles owned, territory percentage, and captured vs available structures
+
+---
+
 ## Phase 3
 
 Territory
 
-Planned
+In Progress
 
 - Ownership colours
 - Union overlays

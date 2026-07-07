@@ -1,5 +1,6 @@
 ﻿const mapDataUrl = "data/season1-map.json";
 const unionsDataUrl = "data/unions.json";
+const seasonServerStateDataUrl = "data/season1-servers.json";
 
 const spriteByCode = {
   V1: "assets/sprites/village.png",
@@ -31,6 +32,15 @@ const map = document.getElementById("map");
 const cameraViewport = document.getElementById("cameraViewport");
 const cameraSurface = document.getElementById("cameraSurface");
 const cameraToolbar = document.getElementById("cameraToolbar");
+const workspaceShell = document.getElementById("workspaceShell");
+const serverDock = document.getElementById("serverDock");
+const serverDockButtons = document.getElementById("serverDockButtons");
+const commandCentreView = document.getElementById("commandCentreView");
+const commandCentreCards = document.getElementById("commandCentreCards");
+const mapWorkspaceView = document.getElementById("mapWorkspaceView");
+const workspaceMapTitle = document.getElementById("workspaceMapTitle");
+const legendPanel = document.querySelector(".legend");
+const stageElement = document.querySelector(".stage");
 const colheads = document.getElementById("colheads");
 const colheadsBottom = document.getElementById("colheadsBottom");
 const rowheads = document.getElementById("rowheads");
@@ -71,9 +81,16 @@ const activePointers = new Map();
 let pinchZoomState = null;
 let loadedMapData = null;
 let ownershipService = null;
+let summaryService = null;
+const baseTileOwnerByKey = new Map();
 const appState = {
   unionRegistry: [],
-  ownershipService: null
+  ownershipService: null,
+  summaryService: null,
+  seasonServerState: null,
+  servers: [],
+  activeWorkspace: "command-centre",
+  activeServer: null
 };
 const desktopPanState = {
   isPointerDown: false,
@@ -97,6 +114,359 @@ const touchPanState = {
 
 function getTileKey(row, col) {
   return `${row}-${col}`;
+}
+
+function getUnionLabel(unionId) {
+  if (!unionId) {
+    return "Unassigned";
+  }
+
+  const union = appState.unionRegistry.find((item) => item && item.id === unionId);
+  if (!union) {
+    return unionId;
+  }
+
+  return union.shortName || union.displayName || union.id;
+}
+
+function formatTerritoryPercent(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? `${parsed.toFixed(1)}%` : "0.0%";
+}
+
+function formatStructureSummaryLine(entry) {
+  if (!entry || typeof entry !== "object") {
+    return null;
+  }
+
+  const type = entry.type || "Unknown";
+  const captured = Number.isFinite(Number(entry.captured)) ? Number(entry.captured) : 0;
+  const available = Number.isFinite(Number(entry.available)) ? Number(entry.available) : 0;
+  return `${type}: ${captured} captured, ${available} available`;
+}
+
+function getServerCardSummary(server) {
+  if (!server || !summaryService) {
+    return {
+      activeUnionLabel: getUnionLabel(server && server.activeUnionId),
+      tilesOwnedLabel: "0 / 0",
+      territoryPercentLabel: "0.0%",
+      structureLines: ["No structures"],
+      scoringLabel: "Scoring rules not configured"
+    };
+  }
+
+  const summary = summaryService.getServerSummary(server);
+  const structureLines = Array.isArray(summary.structuresByType)
+    ? summary.structuresByType
+      .map(formatStructureSummaryLine)
+      .filter(Boolean)
+    : [];
+
+  return {
+    activeUnionLabel: summary.activeUnionLabel || "Unassigned",
+    tilesOwnedLabel: `${summary.tilesOwned} / ${summary.totalTiles}`,
+    territoryPercentLabel: formatTerritoryPercent(summary.territoryPercent),
+    structureLines: structureLines.length > 0 ? structureLines : ["No structures"],
+    scoringLabel: summary.scoringDisplay || "Scoring rules not configured"
+  };
+}
+
+function appendCommandCentreMetricRow(metricsContainer, label, valueNode, rowClassName = "") {
+  const row = document.createElement("div");
+
+  if (rowClassName) {
+    row.classList.add(rowClassName);
+  }
+
+  const labelElement = document.createElement("span");
+  labelElement.textContent = label;
+  row.appendChild(labelElement);
+  row.appendChild(valueNode);
+  metricsContainer.appendChild(row);
+}
+
+function createMetricValue(text) {
+  const value = document.createElement("strong");
+  value.textContent = text;
+  return value;
+}
+
+function createStructureSummaryValue(structureLines) {
+  const list = document.createElement("ul");
+  list.className = "command-centre-structure-list";
+
+  structureLines.forEach((line) => {
+    const item = document.createElement("li");
+    item.textContent = line;
+    list.appendChild(item);
+  });
+
+  return list;
+}
+
+function getActiveServer() {
+  return getServerById(appState.activeServer);
+}
+
+function getServerOwnership(server) {
+  if (!server || typeof server !== "object") {
+    return {};
+  }
+
+  if (!server.ownership || typeof server.ownership !== "object" || Array.isArray(server.ownership)) {
+    server.ownership = {};
+  }
+
+  return server.ownership;
+}
+
+function getBaseTileOwner(tile) {
+  return null;
+}
+
+function getTileOwnerForActiveServer(tile) {
+  if (!tile || typeof tile !== "object") {
+    return null;
+  }
+
+  const server = getActiveServer();
+  if (!server) {
+    return null;
+  }
+
+  const row = Number(tile.row);
+  const col = Number(tile.col);
+
+  if (!Number.isFinite(row) || !Number.isFinite(col)) {
+    return null;
+  }
+
+  const tileKey = getTileKey(row, col);
+  const serverOwnership = getServerOwnership(server);
+
+  if (Object.prototype.hasOwnProperty.call(serverOwnership, tileKey)) {
+    return serverOwnership[tileKey] == null ? null : serverOwnership[tileKey];
+  }
+
+  return null;
+}
+
+function setTileOwnerForActiveServer(tile, ownerId) {
+  if (!tile || typeof tile !== "object") {
+    return null;
+  }
+
+  const server = getActiveServer();
+  if (!server) {
+    return null;
+  }
+
+  const row = Number(tile.row);
+  const col = Number(tile.col);
+
+  if (!Number.isFinite(row) || !Number.isFinite(col)) {
+    return null;
+  }
+
+  const normalizedOwnerId = ownerId == null ? null : ownerId;
+  const tileKey = getTileKey(row, col);
+  const serverOwnership = getServerOwnership(server);
+
+  if (normalizedOwnerId === null) {
+    delete serverOwnership[tileKey];
+    return normalizedOwnerId;
+  }
+
+  serverOwnership[tileKey] = normalizedOwnerId;
+  return normalizedOwnerId;
+}
+
+function createServerDockButton(server) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "server-dock-button";
+  button.setAttribute("data-workspace-target", "server-map");
+  button.setAttribute("data-server-id", server.id);
+  button.textContent = (server.label || server.id || "").replace("Server ", "");
+  return button;
+}
+
+function createCommandCentreCard(server) {
+  const summary = getServerCardSummary(server);
+  const card = document.createElement("article");
+  card.className = "command-centre-card";
+  card.setAttribute("data-workspace-target", "server-map");
+  card.setAttribute("data-server-id", server.id);
+  card.setAttribute("role", "button");
+  card.setAttribute("tabindex", "0");
+  card.setAttribute("aria-label", `Open ${server.label} map workspace`);
+
+  const title = document.createElement("h3");
+  title.textContent = server.label;
+  card.appendChild(title);
+
+  const metrics = document.createElement("div");
+  metrics.className = "command-centre-card-metrics";
+
+  appendCommandCentreMetricRow(metrics, "Active Union", createMetricValue(summary.activeUnionLabel));
+  appendCommandCentreMetricRow(metrics, "Ice Crystals", createMetricValue(summary.scoringLabel));
+  appendCommandCentreMetricRow(metrics, "Tiles Owned", createMetricValue(summary.tilesOwnedLabel));
+  appendCommandCentreMetricRow(metrics, "Territory %", createMetricValue(summary.territoryPercentLabel));
+  appendCommandCentreMetricRow(
+    metrics,
+    "Structures",
+    createStructureSummaryValue(summary.structureLines),
+    "command-centre-metric--multiline"
+  );
+
+  card.appendChild(metrics);
+
+  const openMapAction = document.createElement("button");
+  openMapAction.type = "button";
+  openMapAction.className = "command-centre-open-action";
+  openMapAction.setAttribute("data-workspace-target", "server-map");
+  openMapAction.setAttribute("data-server-id", server.id);
+  openMapAction.textContent = "Open Map";
+  card.appendChild(openMapAction);
+
+  return card;
+}
+
+function renderWorkspaceNavigation() {
+  if (serverDockButtons) {
+    serverDockButtons.innerHTML = "";
+    appState.servers.forEach((server) => {
+      serverDockButtons.appendChild(createServerDockButton(server));
+    });
+  }
+
+  if (commandCentreCards) {
+    commandCentreCards.innerHTML = "";
+    appState.servers.forEach((server) => {
+      commandCentreCards.appendChild(createCommandCentreCard(server));
+    });
+  }
+}
+
+function getServerById(serverId) {
+  return appState.servers.find((server) => server.id === serverId) || null;
+}
+
+function updateWorkspaceShellUI() {
+  if (!workspaceShell) {
+    return;
+  }
+
+  const isCommandCentre = appState.activeWorkspace === "command-centre";
+  workspaceShell.dataset.activeWorkspace = appState.activeWorkspace;
+
+  if (commandCentreView) {
+    commandCentreView.setAttribute("aria-hidden", String(!isCommandCentre));
+  }
+
+  if (mapWorkspaceView) {
+    mapWorkspaceView.setAttribute("aria-hidden", String(isCommandCentre));
+  }
+
+  if (legendPanel) {
+    legendPanel.style.visibility = isCommandCentre ? "hidden" : "visible";
+  }
+
+  if (stageElement) {
+    stageElement.classList.toggle("is-command-centre", isCommandCentre);
+  }
+
+  if (workspaceMapTitle) {
+    const activeServer = getServerById(appState.activeServer);
+    workspaceMapTitle.textContent = activeServer
+      ? `Season 1 Blueprint · ${activeServer.label}`
+      : "Season 1 Blueprint";
+  }
+
+  if (!serverDock) {
+    return;
+  }
+
+  serverDock.querySelectorAll("[data-workspace-target]").forEach((button) => {
+    const targetWorkspace = button.getAttribute("data-workspace-target");
+    const serverId = button.getAttribute("data-server-id");
+    const isActiveCommand = targetWorkspace === "command-centre" && isCommandCentre;
+    const isActiveServer = targetWorkspace === "server-map"
+      && !isCommandCentre
+      && serverId === appState.activeServer;
+
+    button.classList.toggle("is-active", isActiveCommand || isActiveServer);
+  });
+}
+
+function setActiveWorkspace(nextWorkspace, nextServerId = null) {
+  if (nextWorkspace === "server-map") {
+    const server = getServerById(nextServerId) || appState.servers[0];
+
+    appState.activeWorkspace = "server-map";
+    appState.activeServer = server ? server.id : null;
+    clearSelection();
+    renderWorkspaceNavigation();
+    updateWorkspaceShellUI();
+
+    if (loadedMapData) {
+      applyOwnershipOverlays((loadedMapData && loadedMapData.structures) || []);
+      resetCameraView();
+    }
+
+    return;
+  }
+
+  appState.activeWorkspace = "command-centre";
+  appState.activeServer = null;
+  clearSelection();
+  renderWorkspaceNavigation();
+  updateWorkspaceShellUI();
+}
+
+function handleWorkspaceShellClick(event) {
+  const targetButton = event.target.closest("[data-workspace-target]");
+
+  if (!targetButton) {
+    return;
+  }
+
+  const targetWorkspace = targetButton.getAttribute("data-workspace-target");
+  const serverId = targetButton.getAttribute("data-server-id");
+
+  if (targetWorkspace === "server-map") {
+    setActiveWorkspace("server-map", serverId);
+    return;
+  }
+
+  setActiveWorkspace("command-centre");
+}
+
+function attachWorkspaceShellHandlers() {
+  if (serverDock) {
+    serverDock.addEventListener("click", handleWorkspaceShellClick);
+  }
+
+  if (commandCentreView) {
+    commandCentreView.addEventListener("click", handleWorkspaceShellClick);
+    commandCentreView.addEventListener("keydown", (event) => {
+      const targetCard = event.target.closest(".command-centre-card[data-workspace-target]");
+
+      if (!targetCard) {
+        return;
+      }
+
+      if (event.key !== "Enter" && event.key !== " ") {
+        return;
+      }
+
+      event.preventDefault();
+      setActiveWorkspace("server-map", targetCard.getAttribute("data-server-id"));
+    });
+  }
+
+  updateWorkspaceShellUI();
 }
 
 function createHeadCell(value) {
@@ -165,10 +535,30 @@ function initializeOwnershipService() {
 
   ownershipService = window.createOwnershipService({
     getUnionRegistry: () => appState.unionRegistry,
-    getTileByPosition: getTileDataAt
+    getTileByPosition: getTileDataAt,
+    getTileOwner: getTileOwnerForActiveServer,
+    setTileOwner: setTileOwnerForActiveServer
   });
 
   appState.ownershipService = ownershipService;
+}
+
+function buildBaseTileOwnerByKey(mapData) {
+  baseTileOwnerByKey.clear();
+}
+
+function initializeSummaryService() {
+  if (typeof window.createSummaryService !== "function") {
+    return;
+  }
+
+  summaryService = window.createSummaryService({
+    getMapData: () => loadedMapData,
+    getBaseTileOwnerByKey: () => baseTileOwnerByKey,
+    getUnionRegistry: () => appState.unionRegistry
+  });
+
+  appState.summaryService = summaryService;
 }
 
 function getStructureOwnerLabel(structure) {
@@ -948,6 +1338,7 @@ function handleSelectionPanelChange(event) {
 
   applyOwnershipOverlays((loadedMapData && loadedMapData.structures) || []);
   renderSelectionPanel(selectedItem);
+  renderWorkspaceNavigation();
 }
 
 function attachSelectionPanelHandlers() {
@@ -1431,20 +1822,41 @@ function loadUnionRegistry() {
     });
 }
 
+function loadSeasonServerState() {
+  return fetch(seasonServerStateDataUrl)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to load Season 1 server state");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      const servers = Array.isArray(data.servers) ? data.servers : [];
+      appState.seasonServerState = data;
+      appState.servers = servers;
+      return data;
+    });
+}
+
 function initializeMap() {
-  Promise.all([loadMapData(), loadUnionRegistry()])
+  Promise.all([loadMapData(), loadUnionRegistry(), loadSeasonServerState()])
     .then(([mapData]) => {
       loadedMapData = mapData;
+      buildBaseTileOwnerByKey(mapData);
       initializeOwnershipService();
+      initializeSummaryService();
+      renderWorkspaceNavigation();
       renderMap(mapData);
       initializeCamera(mapData);
       attachCameraInputHandlers();
       attachCameraToolbarHandlers();
       attachSelectionPanelHandlers();
+      setActiveWorkspace("command-centre");
     })
     .catch((error) => {
       console.error("Unable to load application data", error);
     });
 }
 
+attachWorkspaceShellHandlers();
 initializeMap();
