@@ -36,12 +36,6 @@ Every milestone must pass these checks before committing.
 
 ☐ Strategic summary blocks are readable.
 
-☐ Command Centre card spacing/hierarchy remains readable at common desktop sizes.
-
-☐ Server dock active workspace/server state is immediately obvious.
-
-☐ Server dock does not cover map content at desktop sizes.
-
 ---
 
 ## Workspaces
@@ -64,11 +58,9 @@ Every milestone must pass these checks before committing.
 
 ☐ Existing tile selection still works after workspace switching.
 
-☐ Dashboard renders one calculated summary card per server.
+☐ Dashboard renders one static card per server.
 
-☐ Each dashboard card shows calculated tiles owned, territory percentage, and captured vs available structures.
-
-☐ Ice Crystal summary shows "Scoring rules not configured" unless verified scoring rules exist.
+☐ Each dashboard card shows placeholder-only strategic values.
 
 ☐ Clicking a dashboard card opens the correct server map workspace.
 
@@ -95,10 +87,6 @@ Every milestone must pass these checks before committing.
 ☐ Territory percentage summary is present.
 
 ☐ Captured vs available structures summary is present.
-
-☐ Strategic summary values refresh correctly after switching server context.
-
-☐ Command Centre and server dock layout stays readable on smaller windows.
 
 ---
 

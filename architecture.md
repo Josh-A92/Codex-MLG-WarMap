@@ -98,7 +98,6 @@ Responsible for:
 - Managing workspace state (Command Centre vs active server map)
 - Managing per-server state selection
 - Centralizing ownership logic in src/services/ownership-service.js
-- Centralizing strategic summaries in src/services/summary-service.js
 - Creating the grid
 - Rendering sprites
 - User interaction
@@ -277,9 +276,7 @@ Command Centre and server workspace summaries should support:
 - territory percentage
 - captured vs available structures
 
-Current implementation calculates tiles owned, territory percentage, and captured vs available structures from shared map data plus per-server ownership state.
-
-Ice Crystal scoring remains intentionally unconfigured unless verified scoring rules are available.
+The first implementation milestone keeps these as explicit placeholders and does not run scoring calculations yet.
 
 ---
 

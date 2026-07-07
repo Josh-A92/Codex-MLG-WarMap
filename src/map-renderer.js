@@ -81,12 +81,9 @@ const activePointers = new Map();
 let pinchZoomState = null;
 let loadedMapData = null;
 let ownershipService = null;
-let summaryService = null;
-const baseTileOwnerByKey = new Map();
 const appState = {
   unionRegistry: [],
   ownershipService: null,
-  summaryService: null,
   seasonServerState: null,
   servers: [],
   activeWorkspace: "command-centre",
@@ -118,168 +115,15 @@ function getTileKey(row, col) {
 
 function getUnionLabel(unionId) {
   if (!unionId) {
-    return "Unassigned";
+    return "Placeholder only";
   }
 
   const union = appState.unionRegistry.find((item) => item && item.id === unionId);
   if (!union) {
-    return unionId;
+    return "Placeholder only";
   }
 
-  return union.shortName || union.displayName || union.id;
-}
-
-function formatTerritoryPercent(value) {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? `${parsed.toFixed(1)}%` : "0.0%";
-}
-
-function formatStructureSummaryLine(entry) {
-  if (!entry || typeof entry !== "object") {
-    return null;
-  }
-
-  const type = entry.type || "Unknown";
-  const captured = Number.isFinite(Number(entry.captured)) ? Number(entry.captured) : 0;
-  const available = Number.isFinite(Number(entry.available)) ? Number(entry.available) : 0;
-  return `${type}: ${captured} captured, ${available} available`;
-}
-
-function getServerCardSummary(server) {
-  if (!server || !summaryService) {
-    return {
-      activeUnionLabel: getUnionLabel(server && server.activeUnionId),
-      tilesOwnedLabel: "0 / 0",
-      territoryPercentLabel: "0.0%",
-      structureLines: ["No structures"],
-      scoringLabel: "Scoring rules not configured"
-    };
-  }
-
-  const summary = summaryService.getServerSummary(server);
-  const structureLines = Array.isArray(summary.structuresByType)
-    ? summary.structuresByType
-      .map(formatStructureSummaryLine)
-      .filter(Boolean)
-    : [];
-
-  return {
-    activeUnionLabel: summary.activeUnionLabel || "Unassigned",
-    tilesOwnedLabel: `${summary.tilesOwned} / ${summary.totalTiles}`,
-    territoryPercentLabel: formatTerritoryPercent(summary.territoryPercent),
-    structureLines: structureLines.length > 0 ? structureLines : ["No structures"],
-    scoringLabel: summary.scoringDisplay || "Scoring rules not configured"
-  };
-}
-
-function appendCommandCentreMetricRow(metricsContainer, label, valueNode, rowClassName = "") {
-  const row = document.createElement("div");
-
-  if (rowClassName) {
-    row.classList.add(rowClassName);
-  }
-
-  const labelElement = document.createElement("span");
-  labelElement.textContent = label;
-  row.appendChild(labelElement);
-  row.appendChild(valueNode);
-  metricsContainer.appendChild(row);
-}
-
-function createMetricValue(text) {
-  const value = document.createElement("strong");
-  value.textContent = text;
-  return value;
-}
-
-function createStructureSummaryValue(structureLines) {
-  const list = document.createElement("ul");
-  list.className = "command-centre-structure-list";
-
-  structureLines.forEach((line) => {
-    const item = document.createElement("li");
-    item.textContent = line;
-    list.appendChild(item);
-  });
-
-  return list;
-}
-
-function getActiveServer() {
-  return getServerById(appState.activeServer);
-}
-
-function getServerOwnership(server) {
-  if (!server || typeof server !== "object") {
-    return {};
-  }
-
-  if (!server.ownership || typeof server.ownership !== "object" || Array.isArray(server.ownership)) {
-    server.ownership = {};
-  }
-
-  return server.ownership;
-}
-
-function getBaseTileOwner(tile) {
-  return null;
-}
-
-function getTileOwnerForActiveServer(tile) {
-  if (!tile || typeof tile !== "object") {
-    return null;
-  }
-
-  const server = getActiveServer();
-  if (!server) {
-    return null;
-  }
-
-  const row = Number(tile.row);
-  const col = Number(tile.col);
-
-  if (!Number.isFinite(row) || !Number.isFinite(col)) {
-    return null;
-  }
-
-  const tileKey = getTileKey(row, col);
-  const serverOwnership = getServerOwnership(server);
-
-  if (Object.prototype.hasOwnProperty.call(serverOwnership, tileKey)) {
-    return serverOwnership[tileKey] == null ? null : serverOwnership[tileKey];
-  }
-
-  return null;
-}
-
-function setTileOwnerForActiveServer(tile, ownerId) {
-  if (!tile || typeof tile !== "object") {
-    return null;
-  }
-
-  const server = getActiveServer();
-  if (!server) {
-    return null;
-  }
-
-  const row = Number(tile.row);
-  const col = Number(tile.col);
-
-  if (!Number.isFinite(row) || !Number.isFinite(col)) {
-    return null;
-  }
-
-  const normalizedOwnerId = ownerId == null ? null : ownerId;
-  const tileKey = getTileKey(row, col);
-  const serverOwnership = getServerOwnership(server);
-
-  if (normalizedOwnerId === null) {
-    delete serverOwnership[tileKey];
-    return normalizedOwnerId;
-  }
-
-  serverOwnership[tileKey] = normalizedOwnerId;
-  return normalizedOwnerId;
+  return `${union.shortName || union.displayName || union.id} (placeholder only)`;
 }
 
 function createServerDockButton(server) {
@@ -293,7 +137,6 @@ function createServerDockButton(server) {
 }
 
 function createCommandCentreCard(server) {
-  const summary = getServerCardSummary(server);
   const card = document.createElement("article");
   card.className = "command-centre-card";
   card.setAttribute("data-workspace-target", "server-map");
@@ -309,16 +152,13 @@ function createCommandCentreCard(server) {
   const metrics = document.createElement("div");
   metrics.className = "command-centre-card-metrics";
 
-  appendCommandCentreMetricRow(metrics, "Active Union", createMetricValue(summary.activeUnionLabel));
-  appendCommandCentreMetricRow(metrics, "Ice Crystals", createMetricValue(summary.scoringLabel));
-  appendCommandCentreMetricRow(metrics, "Tiles Owned", createMetricValue(summary.tilesOwnedLabel));
-  appendCommandCentreMetricRow(metrics, "Territory %", createMetricValue(summary.territoryPercentLabel));
-  appendCommandCentreMetricRow(
-    metrics,
-    "Structures",
-    createStructureSummaryValue(summary.structureLines),
-    "command-centre-metric--multiline"
-  );
+  metrics.innerHTML = `
+    <div><span>Active Union</span><strong>${getUnionLabel(server.activeUnionId)}</strong></div>
+    <div><span>Ice Crystals</span><strong>Placeholder only</strong></div>
+    <div><span>Tiles Owned</span><strong>Placeholder only</strong></div>
+    <div><span>Territory %</span><strong>Placeholder only</strong></div>
+    <div><span>Structures</span><strong>Placeholder only (captured vs available)</strong></div>
+  `;
 
   card.appendChild(metrics);
 
@@ -406,12 +246,9 @@ function setActiveWorkspace(nextWorkspace, nextServerId = null) {
 
     appState.activeWorkspace = "server-map";
     appState.activeServer = server ? server.id : null;
-    clearSelection();
-    renderWorkspaceNavigation();
     updateWorkspaceShellUI();
 
     if (loadedMapData) {
-      applyOwnershipOverlays((loadedMapData && loadedMapData.structures) || []);
       resetCameraView();
     }
 
@@ -421,7 +258,6 @@ function setActiveWorkspace(nextWorkspace, nextServerId = null) {
   appState.activeWorkspace = "command-centre";
   appState.activeServer = null;
   clearSelection();
-  renderWorkspaceNavigation();
   updateWorkspaceShellUI();
 }
 
@@ -535,30 +371,10 @@ function initializeOwnershipService() {
 
   ownershipService = window.createOwnershipService({
     getUnionRegistry: () => appState.unionRegistry,
-    getTileByPosition: getTileDataAt,
-    getTileOwner: getTileOwnerForActiveServer,
-    setTileOwner: setTileOwnerForActiveServer
+    getTileByPosition: getTileDataAt
   });
 
   appState.ownershipService = ownershipService;
-}
-
-function buildBaseTileOwnerByKey(mapData) {
-  baseTileOwnerByKey.clear();
-}
-
-function initializeSummaryService() {
-  if (typeof window.createSummaryService !== "function") {
-    return;
-  }
-
-  summaryService = window.createSummaryService({
-    getMapData: () => loadedMapData,
-    getBaseTileOwnerByKey: () => baseTileOwnerByKey,
-    getUnionRegistry: () => appState.unionRegistry
-  });
-
-  appState.summaryService = summaryService;
 }
 
 function getStructureOwnerLabel(structure) {
@@ -1338,7 +1154,6 @@ function handleSelectionPanelChange(event) {
 
   applyOwnershipOverlays((loadedMapData && loadedMapData.structures) || []);
   renderSelectionPanel(selectedItem);
-  renderWorkspaceNavigation();
 }
 
 function attachSelectionPanelHandlers() {
@@ -1842,9 +1657,7 @@ function initializeMap() {
   Promise.all([loadMapData(), loadUnionRegistry(), loadSeasonServerState()])
     .then(([mapData]) => {
       loadedMapData = mapData;
-      buildBaseTileOwnerByKey(mapData);
       initializeOwnershipService();
-      initializeSummaryService();
       renderWorkspaceNavigation();
       renderMap(mapData);
       initializeCamera(mapData);
