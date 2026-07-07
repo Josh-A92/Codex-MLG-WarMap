@@ -43,3 +43,20 @@
 ## v0.2.11
 - Updated project documentation to reflect the completed Phase 1 Interactive Map work and the upcoming Phase 2 Camera milestone
 - Added the camera design note in docs/CAMERA.md covering input-independent, device-neutral camera behaviour and the 20x20 internal-grid visual model
+## v0.2.12
+- Added the internal camera state foundation with a single transformed camera surface, Royal City based default centering, and data-driven zoom bounds
+- Kept selection, hover, and structure footprint behaviour unchanged while preparing for later camera controls
+## v0.2.13
+- Added continuous mouse wheel zoom and pinch zoom to the camera viewport, preserving cursor-centered zoom and existing selection and hover behaviour
+## v0.2.14
+- Tightened the camera minimum zoom so zooming out stops at a more practical view and the map remains the clear focus
+## v0.2.15
+- Retuned the camera minimum zoom to fit the full 20x20 map more neatly with only a small surrounding margin
+## v0.2.16
+- Added desktop mouse camera panning on empty map space with a drag threshold, while preserving existing click selection, zoom behavior, and instant stop on mouse release
+## v0.2.17
+- Fixed desktop pan so left-drag can start from tiles, markers, overlays, or empty map space, suppressing click selection after thresholded drag and preventing text/image drag artifacts
+## v0.2.18
+- Added touch camera pan with single-finger drag threshold, immediate stop on touch end, tap-to-select preservation, and coexistence with existing pinch zoom behavior
+## v0.2.19
+- Added adaptive camera pan constraints with approximately one-tile overscroll at each map edge, scaling with zoom and viewport size so the map cannot be dragged off-screen

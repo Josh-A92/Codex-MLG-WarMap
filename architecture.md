@@ -156,3 +156,102 @@ Each module should have a clearly defined responsibility.
 The renderer should be capable of rendering ANY correctly formatted map.
 
 It should not know anything about Season 1 specifically.
+---
+
+# Input Independence
+
+WarMap is designed to be device-neutral.
+
+Core functionality should not depend on a specific input device.
+
+Features should be designed around user actions, with equivalent interactions provided wherever practical for:
+
+- Mouse
+- Keyboard
+- Trackpad
+- Touch
+
+Examples:
+
+| Action | Mouse | Trackpad | Touch |
+|---------|-------|----------|-------|
+| Select | Click | Tap | Tap |
+| Pan | Drag | Two-finger drag | Drag |
+| Zoom | Mouse Wheel | Pinch | Pinch |
+| Reset View | Button | Button | Button |
+| Fit Map | Button | Button | Button |
+
+The application should provide a consistent experience across supported devices while allowing each platform to use its own natural interaction methods.
+
+---
+
+# Structure Footprints
+
+The application always stores and understands the world as a logical 20 × 20 grid.
+
+Large structures may occupy multiple logical tiles using footprint information supplied by the map data.
+
+Examples include:
+
+- Town
+- Metropolis
+- Royal City
+
+For presentation purposes, these structures are rendered as a single user-facing cell.
+
+This means:
+
+- Internal grid lines are hidden within the footprint.
+- Internal tile labels are hidden.
+- Hover behaves as one structure.
+- Selection behaves as one structure.
+- The information panel represents the structure as a single object.
+
+The logical grid must remain unchanged for future systems such as ownership, history, analytics and map editing.
+
+---
+
+# Camera Principles
+
+The camera is responsible only for viewing the map.
+
+It must never modify:
+
+- Map data
+- Selection state
+- Structure data
+
+The camera should expose logical actions rather than responding directly to specific input devices.
+
+Future camera actions include:
+
+- zoomIn()
+- zoomOut()
+- pan(dx, dy)
+- fit()
+- reset()
+- focusTile(tile)
+- focusStructure(structure)
+
+## Default Camera
+
+The default camera should centre on the Royal City defined by the currently loaded map data.
+
+The default zoom should present the map at the scale where large structures are immediately recognisable without requiring the user to zoom.
+
+Reset View always returns to this default state.
+
+## Camera Behaviour
+
+The camera should support:
+
+- Continuous zoom
+- Cursor or finger-centred zoom
+- Smooth camera movement
+- Immediate stop when panning ends (no momentum)
+- Approximately one tile of overscroll beyond the map boundary
+- No map rotation
+
+Selection remains independent from camera position and zoom.
+
+The camera is responsible only for determining what part of the map is visible.

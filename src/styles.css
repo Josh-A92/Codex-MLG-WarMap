@@ -87,11 +87,34 @@ h1 { margin:0; font-size:22px; letter-spacing:.4px; }
 }
 .map-head strong { font-size:18px; }
 .map-head span { color:#b6c8d9; font-size:13px; }
+.camera-viewport {
+  width:min(100%, 980px);
+  aspect-ratio:1 / 1;
+  position:relative;
+  overflow:hidden;
+  touch-action:none;
+  cursor:grab;
+  user-select:none;
+  -webkit-user-select:none;
+}
+.camera-viewport.is-panning {
+  cursor:grabbing;
+}
+.camera-viewport,
+.camera-viewport * {
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-user-drag:none;
+}
 .grid-wrap {
   display:grid;
   grid-template-columns: 30px max-content 30px;
   grid-template-rows: 30px max-content 30px;
   gap:6px;
+}
+.camera-viewport > .grid-wrap {
+  transform-origin:0 0;
+  will-change:transform;
 }
 .colheads, .colheads-bottom {
   grid-column:2;
